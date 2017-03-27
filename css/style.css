@@ -32,6 +32,10 @@ h3 {
     background: #fff;
 }
 
+.chatRow {
+	text-align:left;
+}
+
 input,
 button
 {

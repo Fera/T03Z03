@@ -3,7 +3,7 @@
 
 	var chat = {
 
-		renderRow: function(dataObjct){
+		renderRow: function(dataObject){
 
 			var chatRow = document.createElement("div"),
 				date = new Date(),
@@ -12,14 +12,15 @@
 
 			chatRow.classList.add("chatRow");
 
-			if (dataObject.type == "status")
+			if(dataObject.type == "status")
 				message = "<span class='status'>" + dataObject.message + "</span>";
 			else
 				message = "<span class='name'>" + dataObject.name + ": </span><span class='message'>" + dataObject.message + "</span>";
 
 			chatRow.innerHTML = "<span class='time'>" + time + "</span>\n" + message;
 
-			this.chatWidow.appendChild(chatRow);
+			this.chatWindow.appendChild(chatRow);
+			this.chatWindow.scrollTop = this.chatWindow.scrollHeight;
 
 
 		},
@@ -28,7 +29,7 @@
 
 			var data = JSON.stringify(msgObject);
 
-			// wysyłamy wiadomość na serwer
+			this.socket.send(data);
 		},
 
 		displayMessage: function(e){
@@ -42,8 +43,13 @@
 			var message = this.messageInput.value;
 
 			if (message !==""){
-				// wysyłamy wiadomość na serwer
 				
+				this.sendData({
+
+					type: "message",
+					message: message
+
+				});			
 
 				this.messageInput.value = "";
 			}
@@ -52,7 +58,6 @@
 		joinToChat: function(e){
 
 			var name = this.nameInput.value;
-
 
 			if(name !== ""){
 				this.sendData({
@@ -69,6 +74,28 @@
 			} 
 
 		},
+
+		stopApp: function(){
+
+			this.joinButton.onclick = null;
+			this.joinButton.setAttribute("disabled", "disabled");
+
+			this.submitButton.onclick = null;
+			this.submitButton.setAttribute("disabled", "disabled");
+
+			this.renderRow({
+				type: "status",
+				message: "Przerwano połaczenie z serwerem"
+			});
+		},
+
+		connectToServer: function(){
+
+			this.socket = new WebSocket("ws://localhost:8000");
+			this.socket.onmessage = this.displayMessage.bind(this);
+			this.socket.onclose = this.stopApp.bind(this);
+
+		},
 	
 		init: function(){
 
@@ -81,6 +108,8 @@
 			this.submitButton = document.querySelector("#submit");
 
 			this.joinButton.onclick = this.joinToChat.bind(this);
+
+			this.connectToServer();
 		}
 
 	};
