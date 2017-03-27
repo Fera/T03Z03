@@ -1,136 +1,89 @@
 
-	// var supportOutput = document.querySelector("#output");
+	
 
-	// if (typeof Storage !== undefined) {
+	var chat = {
 
-	// 	supportOutput.innerHTML = "Twój plan się powiedzie - masz nasze wsparcie ;-)";
-	// 	supportOutput.classList.add("alert-sucess");
+		renderRow: function(dataObjct){
 
-	// 	window.onstorage = function(e) {
+			var chatRow = document.createElement("div"),
+				date = new Date(),
+				time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds(),
+				message;
 
-	// 		console.log(e);
+			chatRow.classList.add("chatRow");
 
-	// 	};
+			if (dataObject.type == "status")
+				message = "<span class='status'>" + dataObject.message + "</span>";
+			else
+				message = "<span class='name'>" + dataObject.name + ": </span><span class='message'>" + dataObject.message + "</span>";
+
+			chatRow.innerHTML = "<span class='time'>" + time + "</span>\n" + message;
+
+			this.chatWidow.appendChild(chatRow);
 
 
-	// 	// window.localStorage.setItem("imię", "Jan");
+		},
 
-	// 	console.log(window.localStorage);
+		sendData: function(msgObject){
 
-	// }else {
+			var data = JSON.stringify(msgObject);
 
-	// 	supportOutput.innerHTML = "Twój plan zawiedzie na całej linii - nikt Cię nie lubi :P";
-	// 	supportOutput.classList.add("alert-danger");
+			// wysyłamy wiadomość na serwer
+		},
 
-	// }
+		displayMessage: function(e){
 
-	function FormSaver(form){
-		this.form = form;
-		this.fields = this.form.querySelectorAll("input[name]:not([type=submit])");
-		this.formID = this.form.getAttribute("id");
-		this.fieldsValues = {};
+			var dataObject = JSON.parse(e.data);
 
-		this.addSavingToFields();
-	}
+			this.renderRow(dataObject);
+		},
 
-	FormSaver.prototype.addSavingToFields = function(){
+		sendMessage: function(){
+			var message = this.messageInput.value;
 
-		for (var i = 0; i < this.fields.length; i++){
-			this.fields[i].onchange = this.saveField.bind(this);
+			if (message !==""){
+				// wysyłamy wiadomość na serwer
+				
+
+				this.messageInput.value = "";
+			}
+		},
+
+		joinToChat: function(e){
+
+			var name = this.nameInput.value;
+
+
+			if(name !== ""){
+				this.sendData({
+					type: "join",
+					name: name
+				});
+
+				e.target.onclick = null;
+				e.target.setAttribute("disabled", "disabled");
+				this.nameInput.setAttribute("readonly", "readonly");
+
+				this.submitButton.removeAttribute("disabled");
+				this.submitButton.onclick = this.sendMessage.bind(this);
+			} 
+
+		},
+	
+		init: function(){
+
+			if (!window.WebSocket) return; // jeśli nie jest wspierany websocket przerywam funkcję
+
+			this.nameInput = document.querySelector("#yourName");
+			this.joinButton = document.querySelector("#join");
+			this.chatWindow = document.querySelector("#chatWindow");
+			this.messageInput = document.querySelector("#message");
+			this.submitButton = document.querySelector("#submit");
+
+			this.joinButton.onclick = this.joinToChat.bind(this);
 		}
-	};
-
-	FormSaver.prototype.saveField = function(e){
-
-		var that = e.target;
-
-		this.fieldsValues[that.getAttribute("name")] = that.value;
-
-		this.saveToLocalStorage();
-	};
-
-	if ("localStorage" in window) {
-		var formToSave = new FormSaver(document.querySelector("#form"));
-	}
-
-	FormSaver.prototype.saveToLocalStorage = function(){
-
-
-		window.localStorage.setItem(this.formID, JSON.stringify(this.fieldsValues));
 
 	};
 
-	// var DB1 = new LocalDB("DB1");
+	chat.init();
 
-	// var janek = {
-	// 	firstName: "Jan",
-	// 	lastName: "Kowalski",
-	// 	age: 32
-	// };
-
-	// function save() {
-	// 	localStorage.setItem(
-	// 		document.forms.formularz.nazwisko.value ,
-	// 		document.forms.formularz.pensja.value
-	// 	);
-	// }
-
-	// DB1.save("janek", janek);
-
-	// function read() {
-	// 	document.forms.formularz.pensja.value = 									
-	// 	localStorage.getItem( document.forms.formularz.nazwisko.value );
-	// }
-
-	// DB1.read("janek", janek);
-
-	// function delete() {
-	// 	document.forms.formularz.data.value = 									
-	// 	localStorage.removeItem( document.forms.formularz.nazwisko.value );
-	// }
-
-	// DB1.delete("janek", jane);
-
-	// function show() {
-	// 	var content(); = "";
-	// 	for(var key in localStorage)
-	// 		content += ( key + ' ' + localStorage.getItem( key ) + 'rn' );
-	// 	alert ( content );
-	// }
-
-	// DB1.show("janek", janek);
-
-
-
-
-
-
-
-// Tworzona jest nowa instancja,
-// w której należy zapamiętać nazwę "DB1"
-//var DB1 = new LocalDB("DB1");
-
-// Jakiś obiekt do zapisania
-//var janek = {
-//    firstName: "Jan",
-//    lastName: "Kowalski",
-//    age: 32
-//};
-
-// Na prototypie LocalDB znajdować się
-// musi metoda save, która przyjmuje
-// parę klucz-wartość, a wartość powinna
-// być przed zapisaniem przepuszczona
-// przez JSON.stringify
-//DB1.save("janek", janek);
-
-// Prototyp LocalDB powinien również
-// posiadać metodę get, która odczyta
-// podany klucz, przepuszczając wartość
-// przez JSON.parse
-//DB1.get("janek");
-
-// Porada. Aby móżna było tworzyć bazy danych
-// o różnych nazwach, przy zapisywaniu poszczególnych
-// danych, do klucza dodawaj nazwę bazy danych,
-// np. "DB1.janek"

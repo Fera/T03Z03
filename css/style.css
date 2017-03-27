@@ -7,12 +7,58 @@ body
     background: #fff;
 }
 
-.container {
-    width:800px;
-    margin:0 auto;
+.container
+{
+    width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+
+    background: #f1f1f1;
 }
 
-#output {
+h3 {
+	margin:0 0 40px;
+}
 
-    margin:30px 0 ;
+#chatWindow
+{
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 20px 10px;
+
+    text-align: -webkit-left;
+
+    border: 1px solid #ccc;
+    background: #fff;
+}
+
+input,
+button
+{
+    outline: none;
+}
+
+span.time
+{
+    font-size: 12px;
+    font-style: italic;
+
+    margin-right: 10px;
+
+    color: #a1a1a1;
+}
+
+span.status
+{
+    font-size: 12px;
+    font-style: italic;
+
+    color: #07ba04;
+}
+
+span.name
+{
+    font-weight: bold;
+
+    margin-right: 5px;
 }
